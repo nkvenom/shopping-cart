@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import './App.css';
 import ProductList from "./components/product-list";
 import Cart from "./components/cart";
@@ -27,12 +27,15 @@ class App extends Component {
         }
         this.addToCart = this.addToCart.bind(this);
         this.removeFromCart = this.removeFromCart.bind(this);
+        this.onAddToCart = this.onAddToCart.bind(this);
+        this.onRemoveFromCart = this.onRemoveFromCart.bind(this);
+        this.updateTotals = this.updateTotals.bind(this);
     }
 
     addToCart(index) {
         const products = this.state.products;
         products[index].cartQuantity = 1;
-        let cart = {...this.state.cart};
+        let cart = { ...this.state.cart };
         cart.items.push({
             id: products[index].id,
             price: products[index].price,
@@ -48,7 +51,7 @@ class App extends Component {
     removeFromCart(index) {
         const products = this.state.products;
         products[index].cartQuantity = 0;
-        let cart = {...this.state.cart};
+        let cart = { ...this.state.cart };
         let cartIndex = this.state.cart.items.findIndex(item => item.id === products[index].id);
         cart.items.splice(cartIndex, 1);
         this.setState({
@@ -57,6 +60,37 @@ class App extends Component {
         })
     }
 
+    onAddToCart(e, p, i) {
+        console.log({ e, p, i });
+        this.addToCart(i);
+        this.updateTotals();
+
+    }
+
+    onRemoveFromCart(e, p, i) {
+        this.removeFromCart(i);
+        this.updateTotals();
+    }
+
+    updateTotals() {
+        let subTotal = 0;
+        const cart = this.state.cart;
+        for (const it of cart.items) {
+            subTotal += it.price;
+        }
+        console.log("🦊>>>> ~ updateTotals ~ subTotal", subTotal)
+        const discountVal = Number(this.state.cart.selectedCoupon) / 100;
+        console.log("🦊>>>> ~ updateTotals ~ discountVal", discountVal)
+
+        const totalPrice = subTotal - subTotal * discountVal;
+        this.setState({
+            cart: {
+                ...cart,
+                subTotal,
+                totalPrice,
+            }
+        })
+    }
 
     render() {
 
@@ -64,8 +98,19 @@ class App extends Component {
             <div>
                 <h8k-navbar header={title}></h8k-navbar>
                 <div className="layout-row shop-component">
-                    <ProductList products={this.state.products}/>
-                    <Cart cart={this.state.cart}/>
+                    <ProductList onAddToCart={this.onAddToCart} onRemoveFromCart={this.onRemoveFromCart} products={this.state.products} />
+                    <Cart cart={this.state.cart} onSelectCoupon={(e) => {
+                        const c = e.target.value;
+                        console.log("🦊>>>> ~ render ~ c", c)
+                        const { cart } = this.state;
+                        this.setState({
+                            cart: {
+                                ...cart,
+                                selectedCoupon: c,
+                            }
+                        })
+                        this.updateTotals();
+                    }} />
                 </div>
             </div>
         );

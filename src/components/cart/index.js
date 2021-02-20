@@ -43,7 +43,7 @@ export default class Cart extends Component {
                 </table>
                 <div className="layout-row justify-content-between align-items-center px-8 mx-12">
                     <h5>Select Coupon</h5>
-                    <select data-testid="cart-coupon"
+                    <select onChange={this.props.onSelectCoupon} data-testid="cart-coupon"
                             className="coupon-select">
                         <option value="0">None</option>
                         <option value="10">OFF10</option>
