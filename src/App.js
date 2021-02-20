@@ -72,14 +72,14 @@ class App extends Component {
         this.updateTotals();
     }
 
-    updateTotals() {
+    updateTotals(selectedCoupon) {
         let subTotal = 0;
         const cart = this.state.cart;
         for (const it of cart.items) {
             subTotal += it.price;
         }
         console.log("🦊>>>> ~ updateTotals ~ subTotal", subTotal)
-        const discountVal = Number(this.state.cart.selectedCoupon) / 100;
+        const discountVal = isNaN(selectedCoupon) ? 0 : (Number(selectedCoupon) / 100);
         console.log("🦊>>>> ~ updateTotals ~ discountVal", discountVal)
 
         const totalPrice = subTotal - subTotal * discountVal;
@@ -100,16 +100,17 @@ class App extends Component {
                 <div className="layout-row shop-component">
                     <ProductList onAddToCart={this.onAddToCart} onRemoveFromCart={this.onRemoveFromCart} products={this.state.products} />
                     <Cart cart={this.state.cart} onSelectCoupon={(e) => {
-                        const c = e.target.value;
-                        console.log("🦊>>>> ~ render ~ c", c)
+                        const selectedCoupon = e.target.value;
+                        console.log("🦊>>>> ~ render ~ c", selectedCoupon)
                         const { cart } = this.state;
                         this.setState({
                             cart: {
                                 ...cart,
-                                selectedCoupon: c,
-                            }
+                                selectedCoupon,
+                            },
+                            selectedCoupon
                         })
-                        this.updateTotals();
+                        this.updateTotals(selectedCoupon);
                     }} />
                 </div>
             </div>
